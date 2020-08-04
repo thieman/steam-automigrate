@@ -6,6 +6,10 @@ import (
 	"github.com/thieman/steam-automigrate/internal/steam"
 )
 
+func DoPlan() error {
+	return nil
+}
+
 func DoMigrate() error {
 	config, err := steam.GetConfig()
 	if err != nil {

@@ -1,7 +1,7 @@
 package migrate
 
 import (
-	"fmt"
+	"sort"
 	"strconv"
 	"time"
 
@@ -42,7 +42,7 @@ func getDesiredLocations(config *steam.Config) (map[string]string, error) {
 }
 
 func getMigrations(config *steam.Config) ([]Migration, error) {
-	_, err := getDesiredLocations(config)
+	desired, err := getDesiredLocations(config)
 	if err != nil {
 		return nil, err
 	}
@@ -52,9 +52,16 @@ func getMigrations(config *steam.Config) ([]Migration, error) {
 		return nil, err
 	}
 
-	fmt.Println(installed)
-
 	var migrations []Migration
+
+	sort.Slice(installed, func(i, j int) bool { return installed[i].SizeOnDiskBytes > installed[j].SizeOnDiskBytes })
+
+	for _, app := range installed {
+		desiredType, found := desired[app.AppID]
+		if !found || desiredType == app.Library.Type {
+			continue
+		}
+	}
 
 	return migrations, nil
 }

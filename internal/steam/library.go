@@ -7,8 +7,12 @@ import (
 )
 
 type Library struct {
-	Path string `toml:"path"`
-	Type string
+	Type            string
+	Path            string `toml:"path"`
+	VolumeName      string
+	FreeSpaceBytes  uint64
+	TotalSpaceBytes uint64
+	PercentFree     float64
 }
 
 func (l *Library) GetManifestPaths() ([]string, error) {

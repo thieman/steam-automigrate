@@ -27,6 +27,13 @@ func main() {
 				},
 			},
 			{
+				Name:  "plan",
+				Usage: "Show which games would be moved where. Does not actually run the migration.",
+				Action: func(c *cli.Context) error {
+					return migrate.DoPlan()
+				},
+			},
+			{
 				Name:  "migrate",
 				Usage: "Automatically migrate games between SSDs and HDDs",
 				Action: func(c *cli.Context) error {

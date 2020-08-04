@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
+	"github.com/minio/minio/pkg/disk"
 )
 
 const DEFAULT_CONFIG = `# Be sure to use single quotes for the paths
@@ -84,6 +85,20 @@ func GetConfig() (*Config, error) {
 	err = validateConfig(config)
 	if err != nil {
 		return nil, err
+	}
+
+	merged := append(config.SSDs, config.HDDs...)
+	for i := range merged {
+		library := merged[i]
+		info, err := disk.GetInfo(filepath.VolumeName(library.Path))
+		if err != nil {
+			return nil, err
+		}
+
+		library.VolumeName = filepath.VolumeName(library.Path)
+		library.FreeSpaceBytes = info.Free
+		library.TotalSpaceBytes = info.Total
+		library.PercentFree = 100 * float64(info.Free) / float64(info.Total)
 	}
 
 	for i := range config.SSDs {
