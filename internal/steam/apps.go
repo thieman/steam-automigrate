@@ -2,6 +2,7 @@ package steam
 
 import (
 	"os"
+	"sort"
 	"strconv"
 
 	"github.com/andygrunwald/vdf"
@@ -13,6 +14,19 @@ type InstalledApp struct {
 	InstallDir      string
 	SizeOnDiskBytes int64
 	Library         *Library
+}
+
+func AppsBySizeForLibrary(library *Library, apps *[]InstalledApp) []InstalledApp {
+	var filtered []InstalledApp
+	for _, app := range *apps {
+		if app.Library == library {
+			filtered = append(filtered, app)
+		}
+	}
+
+	sort.Slice(filtered, func(i, j int) bool { return filtered[i].SizeOnDiskBytes > filtered[j].SizeOnDiskBytes })
+
+	return filtered
 }
 
 func GetInstalledApps(config *Config) ([]InstalledApp, error) {

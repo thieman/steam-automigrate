@@ -3,7 +3,6 @@ package summary
 import (
 	"fmt"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/fatih/color"
@@ -73,14 +72,7 @@ func printLibrarySummary(summarized summarized) {
 }
 
 func printDetails(library *steam.Library, installed *[]steam.InstalledApp, detailed bool) {
-	var filtered []steam.InstalledApp
-	for _, app := range *installed {
-		if app.Library == library {
-			filtered = append(filtered, app)
-		}
-	}
-
-	sort.Slice(filtered, func(i, j int) bool { return filtered[i].SizeOnDiskBytes > filtered[j].SizeOnDiskBytes })
+	filtered := steam.AppsBySizeForLibrary(library, installed)
 
 	var shown uint
 
