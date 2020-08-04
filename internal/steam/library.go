@@ -4,31 +4,15 @@ import (
 	"io/ioutil"
 	"path"
 	"strings"
-
-	"github.com/thieman/steam-automigrate/internal/config"
 )
 
 type Library struct {
-	Path          string
-	Type          string
-	ManifestPaths []string
+	Path string `toml:"path"`
+	Type string
 }
 
-func LibraryFromConfig(config *config.LibraryConfig) (*Library, error) {
-	manifestPaths, err := getManifestPaths(config.Path)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Library{
-		Path:          config.Path,
-		Type:          config.Type,
-		ManifestPaths: manifestPaths,
-	}, nil
-}
-
-func getManifestPaths(libraryPath string) ([]string, error) {
-	dir := path.Join(libraryPath, "steamapps")
+func (l *Library) GetManifestPaths() ([]string, error) {
+	dir := path.Join(l.Path, "steamapps")
 
 	fileinfos, err := ioutil.ReadDir(dir)
 	if err != nil {

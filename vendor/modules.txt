@@ -6,9 +6,25 @@ github.com/BurntSushi/toml
 github.com/andygrunwald/vdf
 # github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d
 github.com/cpuguy83/go-md2man/v2/md2man
+# github.com/dustin/go-humanize v1.0.0
+github.com/dustin/go-humanize
+# github.com/fatih/color v1.9.0
+## explicit
+github.com/fatih/color
+# github.com/mattn/go-colorable v0.1.4
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.11
+github.com/mattn/go-isatty
+# github.com/minio/minio v0.0.0-20200804151537-d90ab904e76c
+## explicit
+github.com/minio/minio/pkg/disk
 # github.com/mitchellh/go-ps v1.0.0
 ## explicit
 github.com/mitchellh/go-ps
+# github.com/montanaflynn/stats v0.5.0
+github.com/montanaflynn/stats
+# github.com/ncw/directio v1.0.5
+github.com/ncw/directio
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
 # github.com/shurcooL/sanitized_anchor_name v1.0.0
@@ -16,5 +32,8 @@ github.com/shurcooL/sanitized_anchor_name
 # github.com/urfave/cli/v2 v2.2.0
 ## explicit
 github.com/urfave/cli/v2
+# golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
 # honnef.co/go/tools v0.0.1-2020.1.5
 ## explicit

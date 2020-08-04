@@ -7,13 +7,12 @@ import (
 	"time"
 
 	"github.com/andygrunwald/vdf"
-	"github.com/thieman/steam-automigrate/internal/config"
 )
 
 // Return a map from Steam App ID to the most recent time
 // each game was played. If multiple Steam users are defined
 // on the system, the most recent time across all users is returned.
-func GetPlaytimes(config *config.Config) (map[string]time.Time, error) {
+func GetPlaytimes(config *Config) (map[string]time.Time, error) {
 	ids, err := steamIds(config)
 	if err != nil {
 		return nil, err

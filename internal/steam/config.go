@@ -1,4 +1,4 @@
-package config
+package steam
 
 import (
 	"errors"
@@ -14,16 +14,11 @@ steam_main_dir = "C:\Program Files (x86)\Steam"
 migrate_threshold_seconds = 2592000  # 1 month
 `
 
-type LibraryConfig struct {
-	Path string `toml:"path"`
-	Type string
-}
-
 type Config struct {
-	SteamMainDir            string          `toml:"steam_main_dir"`
-	SSDs                    []LibraryConfig `toml:"SSD"`
-	HDDs                    []LibraryConfig `toml:"HDD"`
-	MigrateThresholdSeconds int             `toml:"migrate_threshold_seconds"`
+	SteamMainDir            string     `toml:"steam_main_dir"`
+	SSDs                    []*Library `toml:"SSD"`
+	HDDs                    []*Library `toml:"HDD"`
+	MigrateThresholdSeconds int        `toml:"migrate_threshold_seconds"`
 }
 
 // Return the path of the config file. If it does not already exist,
@@ -91,12 +86,12 @@ func GetConfig() (*Config, error) {
 		return nil, err
 	}
 
-	for _, ssd := range config.SSDs {
-		ssd.Type = "ssd"
+	for i := range config.SSDs {
+		config.SSDs[i].Type = "ssd"
 	}
 
-	for _, hdd := range config.HDDs {
-		hdd.Type = "hdd"
+	for i := range config.HDDs {
+		config.HDDs[i].Type = "hdd"
 	}
 
 	return &config, nil

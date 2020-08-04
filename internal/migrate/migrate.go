@@ -3,11 +3,11 @@ package migrate
 import (
 	"fmt"
 
-	"github.com/thieman/steam-automigrate/internal/config"
+	"github.com/thieman/steam-automigrate/internal/steam"
 )
 
 func DoMigrate() error {
-	config, err := config.GetConfig()
+	config, err := steam.GetConfig()
 	if err != nil {
 		return err
 	}

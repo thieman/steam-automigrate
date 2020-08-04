@@ -7,6 +7,7 @@ import (
 
 	"github.com/thieman/steam-automigrate/internal/migrate"
 	"github.com/thieman/steam-automigrate/internal/steam"
+	"github.com/thieman/steam-automigrate/internal/summary"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,8 +19,11 @@ func main() {
 			{
 				Name:  "summary",
 				Usage: "Summarize currently installed games",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{Name: "detailed"},
+				},
 				Action: func(c *cli.Context) error {
-					return nil
+					return summary.DoSummary(c.Bool("detailed"))
 				},
 			},
 			{
