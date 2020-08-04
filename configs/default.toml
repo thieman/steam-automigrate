@@ -1,0 +1,19 @@
+# Be sure to use single quotes for the paths
+steam_main_dir = 'C:\Program Files (x86)\Steam'
+
+migrate_threshold_seconds = 2592000  # 1 month
+
+[[SSD]]
+path = 'D:\SteamLibrary'
+
+[[SSD]]
+path = 'E:\SteamLibrary'
+
+[[SSD]]
+path = 'F:\SteamLibrary'
+
+[[HDD]]
+path = 'Y:\SteamLibrary'
+
+[[HDD]]
+path = 'Z:\SteamLibrary'
