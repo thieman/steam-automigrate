@@ -28,7 +28,7 @@ func printLibrarySummary(library *steam.Library) {
 	fmt.Printf("    "+library.Path+": %2.0f%% Free (%2.0f GB)\n", library.PercentFree, gbFree)
 }
 
-func printDetails(library *steam.Library, installed *[]steam.InstalledApp, detailed bool) {
+func printDetails(library *steam.Library, installed []*steam.InstalledApp, detailed bool) {
 	filtered := steam.AppsBySizeForLibrary(library, installed)
 
 	var shown uint
@@ -67,7 +67,7 @@ func DoSummary(detailed bool) error {
 
 		for _, library := range coll {
 			printLibrarySummary(library)
-			printDetails(library, &installed, detailed)
+			printDetails(library, installed, detailed)
 		}
 	}
 

@@ -12,13 +12,13 @@ type InstalledApp struct {
 	AppID           string
 	AppName         string
 	InstallDir      string
-	SizeOnDiskBytes int64
+	SizeOnDiskBytes uint64
 	Library         *Library
 }
 
-func AppsBySizeForLibrary(library *Library, apps *[]InstalledApp) []InstalledApp {
-	var filtered []InstalledApp
-	for _, app := range *apps {
+func AppsBySizeForLibrary(library *Library, apps []*InstalledApp) []*InstalledApp {
+	var filtered []*InstalledApp
+	for _, app := range apps {
 		if app.Library == library {
 			filtered = append(filtered, app)
 		}
@@ -29,8 +29,18 @@ func AppsBySizeForLibrary(library *Library, apps *[]InstalledApp) []InstalledApp
 	return filtered
 }
 
-func GetInstalledApps(config *Config) ([]InstalledApp, error) {
-	var installed []InstalledApp
+func TotalSizeOfLibraryBytes(library *Library, apps []*InstalledApp) uint64 {
+	var size uint64
+	for _, app := range apps {
+		if app.Library == library {
+			size += app.SizeOnDiskBytes
+		}
+	}
+	return size
+}
+
+func GetInstalledApps(config *Config) ([]*InstalledApp, error) {
+	var installed []*InstalledApp
 
 	merged := append(config.HDDs, config.SSDs...)
 	for i := range merged {
@@ -56,7 +66,7 @@ func GetInstalledApps(config *Config) ([]InstalledApp, error) {
 			}
 
 			state := data["AppState"].(map[string]interface{})
-			size, err := strconv.ParseInt(state["SizeOnDisk"].(string), 10, 64)
+			size, err := strconv.ParseUint(state["SizeOnDisk"].(string), 10, 64)
 			if err != nil {
 				return nil, err
 			}
@@ -69,7 +79,7 @@ func GetInstalledApps(config *Config) ([]InstalledApp, error) {
 				Library:         library,
 			}
 
-			installed = append(installed, app)
+			installed = append(installed, &app)
 		}
 	}
 
