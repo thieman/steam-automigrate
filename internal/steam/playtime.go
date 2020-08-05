@@ -2,7 +2,7 @@ package steam
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -21,7 +21,7 @@ func GetPlaytimes(config *Config) (map[string]time.Time, error) {
 	result := make(map[string]time.Time)
 
 	for _, id := range ids {
-		path := path.Join(config.SteamMainDir, "userdata", id, "config", "localconfig.vdf")
+		path := filepath.Join(config.SteamMainDir, "userdata", id, "config", "localconfig.vdf")
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			continue
 		}

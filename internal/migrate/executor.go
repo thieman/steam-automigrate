@@ -2,6 +2,8 @@ package migrate
 
 import (
 	"fmt"
+	"os/exec"
+	"path/filepath"
 	"sort"
 	"sync"
 
@@ -12,13 +14,37 @@ const SAFETY_BUFFER_BYTES = 2 * 1024 * 1024 * 1024
 
 type migrateResult struct {
 	migration *Migration
+	step      string
 	err       error
 }
 
-func migrateApp(migration *Migration, wg *sync.WaitGroup, outputChannel chan migrateResult) {
+func migrateApp(migration *Migration, wg *sync.WaitGroup, outputChannel chan *migrateResult) {
 	defer wg.Done()
-	fmt.Printf("Migrate %v from %v to %v\n", migration.App.AppName, migration.App.Library.VolumeName, migration.ToLibrary.VolumeName)
-	outputChannel <- migrateResult{migration, nil}
+	fmt.Printf("Migrating %v (%.1f GB) from %v to %v\n", migration.App.AppName, float64(migration.App.SizeOnDiskBytes)/(1024*1024*1024), migration.App.Library.VolumeName, migration.ToLibrary.VolumeName)
+
+	targetManifestPath := filepath.Join(migration.ToLibrary.Path, "steamapps", filepath.Base(migration.App.ManifestPath))
+
+	err := exec.Command("cmd", "/C", "move", migration.App.ManifestPath, targetManifestPath).Run()
+	if err != nil {
+		outputChannel <- &migrateResult{migration, "moving app manifest", err}
+		return
+	}
+
+	sourceInstallDir := filepath.Join(migration.App.Library.Path, "steamapps", "common", migration.App.InstallDirBase)
+	targetInstallDir := filepath.Join(migration.ToLibrary.Path, "steamapps", "common", migration.App.InstallDirBase)
+	err = exec.Command("cmd", "/C", "Xcopy", "/E", "/I", sourceInstallDir, targetInstallDir).Run()
+	if err != nil {
+		outputChannel <- &migrateResult{migration, "copying game directory to target", err}
+		return
+	}
+
+	err = exec.Command("cmd", "/C", "rmdir", "/S", "/Q", sourceInstallDir).Run()
+	if err != nil {
+		outputChannel <- &migrateResult{migration, "deleting source game directory", err}
+		return
+	}
+
+	outputChannel <- &migrateResult{migration, "", nil}
 }
 
 func migrate(config *steam.Config, migrations []*Migration) error {
@@ -38,21 +64,21 @@ func migrate(config *steam.Config, migrations []*Migration) error {
 	}
 
 	var wg sync.WaitGroup
-	outputChannel := make(chan migrateResult)
+	outputChannel := make(chan *migrateResult)
 	var firstError error
 
 outer:
 	for {
-		var result migrateResult
+		var result *migrateResult
 		select {
 		case result = <-outputChannel:
 		default:
 		}
 
-		if result != (migrateResult{}) {
+		if result != nil {
 			if result.err != nil {
 				firstError = result.err
-				fmt.Println("Something went wrong, waiting for already-started migrations to finish")
+				fmt.Printf("Something went wrong with %v while %v, waiting for already-started migrations to finish", result.migration.App.AppName, result.step)
 				break outer
 			}
 
@@ -62,12 +88,12 @@ outer:
 			} else {
 				migrating[result.migration.App.Library] = false
 			}
-		}
 
-		for i, migration := range migrations {
-			if migration == result.migration {
-				migrations[i] = nil
-				break
+			for i, migration := range migrations {
+				if migration == result.migration {
+					migrations[i] = nil
+					break
+				}
 			}
 		}
 
@@ -105,12 +131,15 @@ outer:
 
 		// If we got here, we have more migrations to do but we can't do them yet because we don't
 		// have sufficient space. We'll temporarily block here on the output channel to wait, then
-		// throw the result back on the redirectChannel so we don't have to rework this messy function more.
+		// throw the result back on so we don't have to rework this messy function more.
 		result = <-outputChannel
 		go func() { outputChannel <- result }()
 	}
 
 	wg.Wait()
 
+	if firstError == nil {
+		fmt.Println("Migration complete!")
+	}
 	return firstError
 }

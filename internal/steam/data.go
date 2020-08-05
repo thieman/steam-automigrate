@@ -2,12 +2,12 @@ package steam
 
 import (
 	"io/ioutil"
-	"path"
+	"path/filepath"
 )
 
 // Returns all Steam IDs found in the local Steam install's userdata folder
 func steamIds(config *Config) ([]string, error) {
-	dir := path.Join(config.SteamMainDir, "userdata")
+	dir := filepath.Join(config.SteamMainDir, "userdata")
 
 	fileinfos, err := ioutil.ReadDir(dir)
 	if err != nil {

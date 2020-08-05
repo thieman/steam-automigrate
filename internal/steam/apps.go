@@ -11,8 +11,9 @@ import (
 type InstalledApp struct {
 	AppID           string
 	AppName         string
-	InstallDir      string
+	InstallDirBase  string
 	SizeOnDiskBytes uint64
+	ManifestPath    string
 	Library         *Library
 }
 
@@ -58,6 +59,7 @@ func GetInstalledApps(config *Config) ([]*InstalledApp, error) {
 				}
 				return nil, err
 			}
+			defer f.Close()
 
 			p := vdf.NewParser(f)
 			data, err := p.Parse()
@@ -74,8 +76,9 @@ func GetInstalledApps(config *Config) ([]*InstalledApp, error) {
 			app := InstalledApp{
 				AppID:           state["appid"].(string),
 				AppName:         state["name"].(string),
-				InstallDir:      state["installdir"].(string),
+				InstallDirBase:  state["installdir"].(string),
 				SizeOnDiskBytes: size,
+				ManifestPath:    manifestPath,
 				Library:         library,
 			}
 
