@@ -19,14 +19,14 @@ func printTypeSummary(fromLibraryType string, migrations []*Migration) {
 		size += migration.App.SizeOnDiskBytes
 	}
 
-	gb := size / (1024 * 1024 * 1024)
+	gb := float64(size) / (1024 * 1024 * 1024)
 	other := "HDD"
 	if fromLibraryType == "hdd" {
 		other = "SSD"
 	}
 
 	bold := color.New(color.Bold)
-	bold.Printf("%vs: Will move %d apps totaling %.1d GB to %v\n\n", strings.ToUpper(fromLibraryType), appsCount, gb, other)
+	bold.Printf("%vs: Will move %d apps totaling %.1f GB to %v\n\n", strings.ToUpper(fromLibraryType), appsCount, gb, other)
 }
 
 func printMigrationDetails(fromLibraryType string, migrations []*Migration) {
@@ -65,6 +65,11 @@ func DoPlan() error {
 	migrations, deltas, err := getMigrations(config)
 	if err != nil {
 		return err
+	}
+
+	if len(migrations) == 0 {
+		fmt.Println("Nothing to migrate!")
+		return nil
 	}
 
 	for _, libraryType := range []string{"ssd", "hdd"} {
